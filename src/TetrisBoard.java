@@ -9,9 +9,11 @@ import javax.swing.JPanel;
 
 public class TetrisBoard extends JPanel {
 	private static final long serialVersionUID = -2768315633419131803L;
+	
 	private Image img1, img2, img3, img4;
 	private int dx = 0, dy = 0;
 	private int windowHeight = 690, windowWidth = 700;
+	Tetromino t = new Tetromino(TetrisColor.DARKBLUE);
 
 	public TetrisBoard() throws IOException {
 		img1 = img2 = img3 = img4 = new ImageIcon("src/images/darkblue.png")
@@ -21,7 +23,6 @@ public class TetrisBoard extends JPanel {
 		this.requestFocusInWindow();
 
 		this.addKeyListener(new KeyListener() {
-
 			public void keyTyped(KeyEvent e) {
 			}
 
@@ -33,7 +34,7 @@ public class TetrisBoard extends JPanel {
 				int keyCode = e.getKeyCode();
 				switch (keyCode) {
 				case KeyEvent.VK_UP:
-					dy--;
+					dy--; // TODO: NO MOVING UP
 					break;
 				case KeyEvent.VK_DOWN:
 					dy++;
@@ -43,6 +44,9 @@ public class TetrisBoard extends JPanel {
 					break;
 				case KeyEvent.VK_RIGHT:
 					dx++;
+					break;
+				case KeyEvent.VK_CONTROL:
+					t.rotate();
 					break;
 				}
 				repaint();
