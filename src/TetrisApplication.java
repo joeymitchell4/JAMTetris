@@ -1,5 +1,4 @@
 import java.awt.EventQueue;
-import java.io.IOException;
 
 import javax.swing.JFrame;
 
@@ -11,12 +10,7 @@ public class TetrisApplication extends JFrame {
 	}
 
 	private void initUI() {
-		try {
-			add(new TetrisBoard());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		add(new TetrisBoard());
 
 		setSize(700, 690);
 		setResizable(false); // CANNOT RESIZE GAME
