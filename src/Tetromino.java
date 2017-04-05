@@ -1,6 +1,5 @@
 import java.awt.Graphics;
 import java.awt.Image;
-import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 
@@ -24,9 +23,9 @@ public class Tetromino {
 		switch (color) {
 		case DARKBLUE:
 			occupiedSpace = new boolean[][] { 
-					{ false, false, false },
-					{ true, false, false }, 
-					{ true, true, true } };
+					{ false, true, false },
+					{ false, true, false }, 
+					{ true, true, false } };
 			break;
 		case GREEN:
 			occupiedSpace = new boolean[][] { 
@@ -36,16 +35,16 @@ public class Tetromino {
 			break;
 		case LIGHTBLUE:
 			occupiedSpace = new boolean[][] { 
-					{ false, false, false, false },
-					{ false, false, false, false }, 
-					{ false, false, false, false },
-					{ true, true, true, true } };
+					{ false, true, false, false },
+					{ false, true, false, false }, 
+					{ false, true, false, false },
+					{ false, true, false, false } };
 			break;
 		case ORANGE:
 			occupiedSpace = new boolean[][] { 
-					{ false, false, false },
-					{ false, false, true }, 
-					{ true, true, true } };
+					{ false, true, false },
+					{ false, true, false }, 
+					{ false, true, true } };
 			break;
 		case PURPLE:
 			occupiedSpace = new boolean[][] { 
@@ -91,7 +90,6 @@ public class Tetromino {
 //			System.out.println();
 		}
 		occupiedSpace = rotatedArray;
-//		System.out.println("ROTATED");
 	}
 
 	public void incrementX() {
