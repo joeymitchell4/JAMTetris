@@ -18,7 +18,7 @@ public class TetrisApplication extends JFrame {
 			e.printStackTrace();
 		}
 
-		setSize(700, 700);
+		setSize(700, 690);
 		setResizable(false); // CANNOT RESIZE GAME
 		
 		setTitle("Tetris");
