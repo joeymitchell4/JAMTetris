@@ -6,7 +6,8 @@ import javax.swing.ImageIcon;
 
 public class Tetromino {
 
-	private boolean[][] shapeSpace, boardSpace;
+	private boolean[][] shapeSpace;
+	private BoardBlock[][] boardSpace;
 	private TetrisColor color;
 	private Image img;
 
@@ -16,7 +17,7 @@ public class Tetromino {
 
 	private boolean lock = false;
 
-	public Tetromino(TetrisColor color, boolean[][] boardSpace) {
+	public Tetromino(TetrisColor color, BoardBlock[][] boardSpace) {
 		this.color = color;
 		this.boardSpace = boardSpace;
 
@@ -31,15 +32,33 @@ public class Tetromino {
 			for (int j = 0; j < shapeSpace.length; j++) {
 				if (shapeSpace[i][j]) {
 					g.drawImage(img, 240 + (x + j) * size, (y + i) * size, board);
+					// TODO: DRAW SHADOW HERE
 				}
 			}
 		}
 
 		if (lock) {
+			/* INSERT NEW PIECE INTO boardSpace */
 			for (int i = 0; i < shapeSpace.length; i++) {
 				for (int j = 0; j < shapeSpace[i].length; j++) {
-					if (shapeSpace[i][j]) { 
-						boardSpace[y + i][x + j + 1] = true;
+					if (shapeSpace[i][j]) {
+						boardSpace[y + i][x + j + 1].setTetrisBlock(new ImageIcon("src/images/" + 
+								this.color.toString().toLowerCase() +  ".png")
+								.getImage().getScaledInstance(size, size, Image.SCALE_DEFAULT));
+						boardSpace[y + i][x + j + 1].setInUse(true);
+					}
+				}
+			}
+
+			/* CHECK FOR FULL ROWS & SHIFT DOWN IF NECESSARY */
+			for (int i = 0; i < boardSpace.length - 1; i++) {
+				if (isRowFull(i)) {
+					for (int j = 0; j < boardSpace[i].length; j++) {
+						boardSpace[i][j].setInUse(false);
+						for (int k = i; k >= 1; k--) {
+							boardSpace[k][j].setInUse(boardSpace[k - 1][j].isInUse());
+							boardSpace[k][j].setTetrisBlock(boardSpace[k - 1][j].getTetrisBlock());
+						}
 					}
 				}
 			}
@@ -48,8 +67,8 @@ public class Tetromino {
 			printBoard();
 			System.out.println();
 
-			lock = false;
-			board.boardPieces.add(this);
+			lock = false; // UNLOCK
+
 			board.activePiece = new Tetromino(nextTetromino(), boardSpace);
 			board.activePiece.draw(g, board);
 		}
@@ -73,7 +92,7 @@ public class Tetromino {
 		short numBlankRightRows = getNumBlankRightRows();
 
 		for (int i = 0; i < height; i++) {
-			if (boardSpace[y + i][x - numBlankRightRows + width + 1] && shapeSpace[i][width - numBlankRightRows - 1]) {
+			if (boardSpace[y + i][x - numBlankRightRows + width + 1].isInUse() && shapeSpace[i][width - numBlankRightRows - 1]) {
 				canMove = false;
 				break;
 			}
@@ -87,7 +106,7 @@ public class Tetromino {
 		short numBlankLeftRows = getNumBlankLeftRows();
 
 		for (int i = 0; i < height; i++) {
-			if (boardSpace[y + i][x + numBlankLeftRows] && shapeSpace[i][numBlankLeftRows]) {
+			if (boardSpace[y + i][x + numBlankLeftRows].isInUse() && shapeSpace[i][numBlankLeftRows]) {
 				canMove = false;
 				break;
 			}
@@ -102,7 +121,7 @@ public class Tetromino {
 
 		try { // TODO: THIS IS HACKY
 			for (int j = 0; j < width; j++) {
-				if (boardSpace[y + height - numBlankBottomRows][x + j + 1] && shapeSpace[height - numBlankBottomRows - 1][j]) {
+				if (boardSpace[y + height - numBlankBottomRows][x + j + 1].isInUse() && shapeSpace[height - numBlankBottomRows - 1][j]) {
 					canMove = false;
 					break;
 				}
@@ -237,10 +256,20 @@ public class Tetromino {
 		return TetrisColor.values()[new Random().nextInt(TetrisColor.values().length)];
 	}
 
+	private boolean isRowFull(int rowNumber) {
+		for (int j = 0; j < boardSpace[0].length; j++) {
+			if (!boardSpace[rowNumber][j].isInUse()) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	private void printBoard() {
 		for (int i = 0; i < boardSpace.length; i++) {
 			for (int j = 0; j < boardSpace[i].length; j++) {
-				if (boardSpace[i][j]) System.out.print("1");
+				if (boardSpace[i][j].isInUse()) System.out.print("1");
 				else System.out.print("0");
 			}
 			System.out.println();
