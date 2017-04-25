@@ -1,5 +1,4 @@
 import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -99,6 +98,7 @@ public class TetrisBoard extends JPanel {
 					activePiece.incrementX();
 					break;
 				case KeyEvent.VK_CONTROL:
+					timer.restart();
 					activePiece.rotate();
 					break;
 				}
