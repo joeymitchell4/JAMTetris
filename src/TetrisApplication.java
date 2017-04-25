@@ -12,9 +12,9 @@ public class TetrisApplication extends JFrame {
 	private void initUI() {
 		add(new TetrisBoard());
 
-		setSize(700, 690);
+		setSize(700, 500);
 		setResizable(false); // CANNOT RESIZE GAME
-		
+
 		setTitle("Tetris");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
