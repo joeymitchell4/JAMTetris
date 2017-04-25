@@ -42,7 +42,6 @@ public class Tetromino {
 						boardSpace[y + i][x + j + 1] = true;
 					}
 				}
-				System.out.println();
 			}
 
 			System.out.println();
@@ -67,22 +66,30 @@ public class Tetromino {
 			}
 		}
 		shapeSpace = rotatedArray;
-
-		short temp = width;
-		width = height;
-		height = temp;
 	}
 
 	public void incrementX() {
-		x++;
-		// TODO: FINISH THIS
+		boolean canMove = true;
+		short numBlankRightRows = getNumBlankRightRows();
+
+		for (int i = 0; i < height; i++) {
+			if (boardSpace[y + i][x - numBlankRightRows + width + 1] && shapeSpace[i][width - numBlankRightRows - 1]) {
+				canMove = false;
+				break;
+			}
+		}
+
+		if (canMove) x++;
 	}
 
 	public void decrementX() {
 		boolean canMove = true;
+		short numBlankLeftRows = getNumBlankLeftRows();
+
 		for (int i = 0; i < height; i++) {
-			if (boardSpace[y + i][x] && shapeSpace[i][0]) {
+			if (boardSpace[y + i][x + numBlankLeftRows] && shapeSpace[i][numBlankLeftRows]) {
 				canMove = false;
+				break;
 			}
 		}
 
@@ -91,9 +98,12 @@ public class Tetromino {
 
 	public void incrementY() {
 		boolean canMove = true;
+		short numBlankBottomRows = getNumBlankBottomRows();
+		
 		for (int j = 0; j < width; j++) {
-			if (boardSpace[y + height][x + j + 1] && (shapeSpace[height - 1][j] || width == 1)) { // TODO: HACKY
+			if (boardSpace[y + height - numBlankBottomRows][x + j + 1] && shapeSpace[height - numBlankBottomRows - 1][j]) {
 				canMove = false;
+				break;
 			}
 		}
 
@@ -125,7 +135,7 @@ public class Tetromino {
 					{ false, true, false, false }, 
 					{ false, true, false, false },
 					{ false, true, false, false } };
-			width = 1;
+			width = 4;
 			height = 4;
 			break;
 		case ORANGE:
@@ -160,6 +170,60 @@ public class Tetromino {
 			height = 2;
 			break;
 		}
+	}
+
+	private short getNumBlankBottomRows() {
+		short num = 0;
+		for (int i = height - 1; i >= 0; i--) {
+			boolean hasBlankRow = true;
+			for (int j = 0; j < width; j++) {
+				if (shapeSpace[i][j]) {
+					hasBlankRow = false;
+					break;
+				}
+			}
+
+			if (hasBlankRow) num++;
+			else break;
+		}
+
+		return num;
+	}
+
+	private short getNumBlankLeftRows() {
+		short num = 0;
+		for (int i = 0; i < height; i++) {
+			boolean hasBlankRow = true;
+			for (int j = 0; j < height; j++) {
+				if (shapeSpace[j][i]) {
+					hasBlankRow = false;
+					break;
+				}
+			}
+
+			if (hasBlankRow) num++;
+			else break;
+		}
+
+		return num;
+	}
+
+	private short getNumBlankRightRows() {
+		short num = 0;
+		for (int i = width - 1; i >= 0; i--) {
+			boolean hasBlankRow = true;
+			for (int j = 0; j < height; j++) {
+				if (shapeSpace[j][i]) {
+					hasBlankRow = false;
+					break;
+				}
+			}
+
+			if (hasBlankRow) num++;
+			else break;
+		}
+
+		return num;
 	}
 
 	private TetrisColor nextTetromino() { // CODE INSPIRED BY: http://stackoverflow.com/a/30641206
