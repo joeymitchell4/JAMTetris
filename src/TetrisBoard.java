@@ -17,10 +17,10 @@ public class TetrisBoard extends JPanel {
 	public TetrisBoard() {
 		this.setFocusable(true);
 		this.requestFocusInWindow();
-		
+
 		setupBoardSpace();
 		setupKeyListener();
-		
+
 		activePiece = new Tetromino(TetrisColor.LIGHTBLUE, boardSpace);
 		boardPieces = new ArrayList<Tetromino>();
 	}
@@ -28,7 +28,7 @@ public class TetrisBoard extends JPanel {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
-		// TODO: DO SOMETHING ELSE WITH THIS CRAP
+		// TODO: MAKE THIS MAKE MORE SENSE
 		g.drawLine(windowWidth / 2 - 5 * 20 - 10, 0, windowWidth / 2 - 5 * 20
 				- 10, 20 * 20);
 		g.drawLine(windowWidth / 2 + 5 * 20 - 10, 0, windowWidth / 2 + 5 * 20
@@ -37,7 +37,6 @@ public class TetrisBoard extends JPanel {
 
 		activePiece.draw(g, this);
 		for (int i = 0; i < boardPieces.size(); i++) {
-//			System.out.println(boardPieces.size());
 			boardPieces.get(i).draw(g, this);
 		}
 	}

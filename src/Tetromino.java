@@ -10,7 +10,7 @@ public class Tetromino {
 	private TetrisColor color;
 	private Image img;
 
-	private int x = 4, y = 0; // TODO: GET RID OF THIS HARDCODING
+	private int x = 4, y = 0;
 	private short width, height;
 	private int size = 20;
 
@@ -99,11 +99,18 @@ public class Tetromino {
 	public void incrementY() {
 		boolean canMove = true;
 		short numBlankBottomRows = getNumBlankBottomRows();
-		
-		for (int j = 0; j < width; j++) {
-			if (boardSpace[y + height - numBlankBottomRows][x + j + 1] && shapeSpace[height - numBlankBottomRows - 1][j]) {
-				canMove = false;
-				break;
+
+		try { // TODO: THIS IS HACKY
+			for (int j = 0; j < width; j++) {
+				if (boardSpace[y + height - numBlankBottomRows][x + j + 1] && shapeSpace[height - numBlankBottomRows - 1][j]) {
+					canMove = false;
+					break;
+				}
+			}
+		} catch (ArrayIndexOutOfBoundsException e) {
+			if (height != 4) {
+				e.printStackTrace();
+				return;
 			}
 		}
 
