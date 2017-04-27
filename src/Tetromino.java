@@ -1,5 +1,6 @@
 import java.awt.Graphics;
 import java.awt.Image;
+import java.util.Arrays;
 import java.util.Random;
 
 import javax.swing.ImageIcon;
@@ -13,7 +14,9 @@ public class Tetromino {
 
 	private int x = 4, y = 0;
 	private short width, height;
-	private int size = 20;
+	private int blockSize = 20;
+
+	private Integer[] colors;
 
 	private boolean lock = false;
 
@@ -22,16 +25,34 @@ public class Tetromino {
 		this.boardSpace = boardSpace;
 
 		img = new ImageIcon("src/images/" + this.color.toString().toLowerCase() +  ".png")
-				.getImage().getScaledInstance(size, size, Image.SCALE_DEFAULT);
+				.getImage().getScaledInstance(blockSize, blockSize, Image.SCALE_DEFAULT);
 
 		setupOccupiedSpace();
+	}
+
+	public TetrisColor getColor() {
+		return color;
+	}
+
+	public void setColors(Integer[] colors) {
+		this.colors = colors;
+	}
+
+	public void drawInactive(Graphics g, int x, int y) {
+		for (int i = 0; i < shapeSpace.length; i++) {
+			for (int j = 0; j < shapeSpace.length; j++) {
+				if (shapeSpace[i][j]) {
+					g.drawImage(img, x + j * blockSize, y + i * blockSize, null);
+				}
+			}
+		}
 	}
 
 	public void draw(Graphics g, TetrisBoard board) {
 		for (int i = 0; i < shapeSpace.length; i++) {
 			for (int j = 0; j < shapeSpace.length; j++) {
 				if (shapeSpace[i][j]) {
-					g.drawImage(img, 240 + (x + j) * size, (y + i) * size, board);
+					g.drawImage(img, 240 + (x + j) * blockSize, (y + i) * blockSize, board);
 					// TODO: DRAW SHADOW HERE
 				}
 			}
@@ -44,15 +65,18 @@ public class Tetromino {
 					if (shapeSpace[i][j]) {
 						boardSpace[y + i][x + j + 1].setTetrisBlock(new ImageIcon("src/images/" + 
 								this.color.toString().toLowerCase() +  ".png")
-								.getImage().getScaledInstance(size, size, Image.SCALE_DEFAULT));
+								.getImage().getScaledInstance(blockSize, blockSize, Image.SCALE_DEFAULT));
 						boardSpace[y + i][x + j + 1].setInUse(true);
 					}
 				}
 			}
 
 			/* CHECK FOR FULL ROWS & SHIFT DOWN IF NECESSARY */
+			int numRowsCleared = 0;
 			for (int i = 0; i < boardSpace.length - 1; i++) {
 				if (isRowFull(i)) {
+					board.rowsCleared++;
+					numRowsCleared++;
 					for (int j = 0; j < boardSpace[i].length; j++) {
 						boardSpace[i][j].setInUse(false);
 						for (int k = i; k >= 1; k--) {
@@ -63,13 +87,36 @@ public class Tetromino {
 				}
 			}
 
+			if (numRowsCleared == 4) { // TETRIS
+				board.totalScore += 800; // TODO: CHECK FOR BACK-TO-BACK TETRIS
+				board.levelScore += 800;
+			} else {
+				board.totalScore += 100 * numRowsCleared;
+				board.levelScore += 100 * numRowsCleared;
+			}
+
+			if (board.levelScore >= board.roundTreshold) {
+				board.level++;
+				board.levelScore -= board.roundTreshold;
+				board.setTimerDelay(1000 - 60 * (board.level - 1));
+			}
+
 			System.out.println();
 			printBoard();
 			System.out.println();
 
 			lock = false; // UNLOCK
 
-			board.activePiece = new Tetromino(nextTetromino(), boardSpace);
+			board.activePiece = new Tetromino(board.previewPiece1.getColor(), boardSpace);
+			board.previewPiece1 = new Tetromino(board.previewPiece2.getColor(), boardSpace);
+			board.previewPiece2 = new Tetromino(board.previewPiece3.getColor(), boardSpace);
+			board.previewPiece3 = new Tetromino(randomTetromino(), boardSpace);
+
+			board.activePiece.setColors(new Integer[] {
+					board.previewPiece1.getColor().ordinal(),
+					board.previewPiece2.getColor().ordinal(),
+					board.previewPiece3.getColor().ordinal()});
+
 			board.activePiece.draw(g, board);
 		}
 	}
@@ -252,8 +299,15 @@ public class Tetromino {
 		return num;
 	}
 
-	private TetrisColor nextTetromino() { // CODE INSPIRED BY: http://stackoverflow.com/a/30641206
-		return TetrisColor.values()[new Random().nextInt(TetrisColor.values().length)];
+	public TetrisColor randomTetromino() { // CODE INSPIRED BY: http://stackoverflow.com/a/30641206
+		int i = new Random().nextInt(TetrisColor.values().length);
+		if (colors == null) return TetrisColor.values()[i];
+
+		while (Arrays.asList(colors).contains(i)) { // GET A DIFFERENT RANDOM PIECE
+			i = new Random().nextInt(TetrisColor.values().length);
+		}
+
+		return TetrisColor.values()[i];
 	}
 
 	private boolean isRowFull(int rowNumber) {
